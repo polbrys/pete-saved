@@ -1,0 +1,25 @@
+<%# check_ntp_time.cfg.erb
+    Author: polbrys
+    Date Modified: 06/30/14
+    Description: This file contains the Puppet template
+    for pushing out environment specific information
+    to hosts for the check_ntp_time.cfg file in
+    /etc/nagios/nrpe.d/check_ntp_time.cfg %> 
+# Check status of time offset between the host and the host's primary and secondary NTP peers. Will return "unknown" if peer is unreachable.
+<%- if scope['apperian::server::provider'] == "rdfw" -%><% then -%>
+    <%- @ntp_array = scope['apperian::operations::rdfw_ntp'] -%>
+<%- elsif scope['apperian::server::provider'] == "rord" -%><% then -%>
+    <%- @ntp_array = scope['apperian::operations::rord_ntp'] -%>
+<%- elsif scope['apperian::server::provider'] == "jams" -%><% then -%>
+    <%- @ntp_array = scope['apperian::operations::jams_ntp'] -%>
+<%- elsif scope['apperian::server::provider'] == "tont" -%><% then -%>
+    <%- @ntp_array = scope['apperian::operations::tont_ntp'] -%>
+<%- elsif scope['apperian::server::provider'] == "aore" -%><% then -%>
+    <%- @ntp_array = scope['apperian::operations::aore_ntp'] -%>
+<%- elsif scope['apperian::server::provider'] == "aire" -%><% then -%>
+    <%- @ntp_array = scope['apperian::operations::aire_ntp'] -%>
+<%- else -%>
+    <%- @ntp_array = [ "0.0.0.0", "0.0.0.0" ] -%>
+<%- end -%>
+command[check_ntp_time_primary]=/usr/lib64/nagios/plugins/check_ntp_time -H <%= @ntp_array.first %> -w .5 -c 1
+command[check_ntp_time_secondary]=/usr/lib64/nagios/plugins/check_ntp_time -H <%= @ntp_array.last %> -w .5 -c 1
